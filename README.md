@@ -1,16 +1,15 @@
 # 🔨 Forja-Suite v1.3.0
 
-> *Toolbox de ingeniería de contexto para OpenCode. Lectura universal de archivos, escaneo de proyecto, edición batch multi-archivo, scaffolding, skills, recordatorios y guardias de seguridad.*
+> *Toolbox de ingeniería de contexto para OpenCode. Ocho herramientas que tu agente debería tener desde el día uno.*
 
-[![npm](https://img.shields.io/npm/v/forjasuite)](https://www.npmjs.com/package/forjasuite)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org)
-[![OpenCode Plugin](https://img.shields.io/badge/OpenCode-Plugin-8A2BE2)](https://opencode.ai/docs/plugins)
-[![Bundle](https://img.shields.io/badge/Bundle-100KB-success)](https://github.com/CerebroCanibalus/forjasuite)
+[![GitHub](https://img.shields.io/badge/GitHub-CerebroCanibalus/forjasuite-8B5CFE?logo=github)](https://github.com/CerebroCanibalus/forjasuite)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)](https://www.typescriptlang.org)
+[![Bundle](https://img.shields.io/badge/Bundle-100KB-success)](#)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
 
 ---
 
-## Instalación
+## 📥 Instalación
 
 ### Opción A: GitHub Packages (recomendada)
 
@@ -19,55 +18,53 @@
 "plugin": ["@CerebroCanibalus/forjasuite"]
 ```
 
-OpenCode lo resuelve desde GitHub Packages automáticamente, solo necesitas el registry en tu `~/.npmrc`:
-
+Y en tu `~/.npmrc`:
 ```npmrc
 //npm.pkg.github.com/:_authToken=ghp_<tu-token>
 @CerebroCanibalus:registry=https://npm.pkg.github.com/
 ```
 
-### Opción B: Local (ya funcionando)
+### Opción B: Local (la que no falla)
 
 ```jsonc
 // opencode.jsonc
 "plugin": ["C:\\Users\\<user>\\.config\\opencode\\plugins\\forja-suite"]
 ```
 
-Requiere clonar el repo:
 ```bash
 cd ~/.config/opencode/plugins
 git clone https://github.com/CerebroCanibalus/forjasuite
 cd forjasuite && npm install
 ```
 
-### 3. Reiniciar OpenCode
+### Opción C: nada, usa las tools de serie y sufre
 
-Listo. Las 8 tools están disponibles.
+No recomendada.
+
+> **ℹ️ Sobre npm:** Si, este paquete también está en npm. npm nos pidió 2FA con llave física para publicar. Que se jodan. Usamos GitHub Packages. Misma mierda, menos vueltas.
 
 ---
 
-## Tools
+## 🛠️ Tools
 
-| Tool | Acción |
-|------|--------|
-| `forja_read` | Lector universal. 80+ extensiones, encoding auto-detection (UTF-8 → UTF-16 → Latin-1), fallback hex dump para binarios. Acciones: scan, skeleton, extract, context, batch. |
-| `forja_project` | Escanea estructura/dependencias/tipo del proyecto actual. Sin args = resumen compacto. Lazy con cache. |
-| `forja_check` | Verifica integridad sintáctica: balance de llaves/paréntesis, cierre de strings, calidad de código. Rápido, determinista, sin LLM. |
-| `forja_skill` | Crea, edita y lista skills de OpenCode programáticamente. |
-| `forja_refactor` | Edición batch multi-archivo vía **diff unificado** (determinista, primario) o **Jaccard** (fuzzy, fallback). Transaccional con rollback. |
-| `forja_build` | Creación batch de archivos nuevos. Scaffolding, componentes, migraciones. Crea directorios intermedios automáticamente. |
+| Tool | Qué hace |
+|------|----------|
+| `forja_read` | Lector universal. 80+ extensiones, encoding auto-detect, fallback hex dump. Acciones: scan, skeleton, extract, context, batch. |
+| `forja_project` | Escanea estructura y dependencias del proyecto. Lazy cache. Sin args = resumen. |
+| `forja_check` | Balance de llaves, paréntesis, strings. Rápido, sin LLM, determinista. |
+| `forja_skill` | Crea/edita/lista skills de OpenCode. |
+| `forja_refactor` | Edición batch multi-archivo. Transaccional con rollback. Dif unificado o Jaccard fuzzy. |
+| `forja_build` | Creación batch de archivos. Scaffolding, componentes, migraciones. Crea directorios intermedios. |
 | `forja_remind` | Recordatorios programados. add, list, remove. |
-| `forja_debug` | Estado interno del plugin: caché, sessionId, skills/MCPs encontrados. |
+| `forja_debug` | Estado interno del plugin. Diagnóstico rápido. |
 
 ---
 
-## forja_refactor — Edición Batch Multi-archivo
+## 🔧 forja_refactor — Edición Batch
 
-Operación principal para refactors que tocan **3+ archivos**. Una sola tool call reemplaza múltiples `write`/`edit` secuenciales.
+Carnicero fino para refactors que tocan 3+ archivos. Una tool call reemplaza `write`/`edit` en serie.
 
-### patch (recomendado — determinista)
-
-Usa **diff unificado** (formato estándar de `git diff`, `diff -u`). Incluye contexto alrededor del cambio para anclaje seguro.
+### patch (determinista — recomendado)
 
 ```
 forja_refactor({
@@ -76,19 +73,15 @@ forja_refactor({
     filePath: "src/player.ts",
     diff: "@@ -10,7 +10,7 @@\n function oldName() {\n-  return oldThing\n+  return newThing\n }"
   }],
-  dryRun: true    // ← SIEMPRE usa dryRun primero
+  dryRun: true
 })
 ```
 
-**Formato diff:**
-- `@@ -line,count +line,count @@` — hunk header
-- ` contenido` — línea de contexto (anclaje)
-- `-línea` — línea a eliminar
-- `+línea` — línea a añadir
+**Formato diff:** estándar `git diff` o `diff -u`. Contexto mínimo 2-3 líneas alrededor.
 
 ### jaccard (fallback — fuzzy)
 
-Para cuando no tienes el diff exacto. Pasa `oldBlock` (lo que buscas) y `newBlock` (reemplazo).
+Cuando no tienes el diff exacto. Pasa `oldBlock` y `newBlock`.
 
 ```
 forja_refactor({
@@ -97,48 +90,26 @@ forja_refactor({
     filePath: "src/enemy.ts",
     oldBlock: "return oldThing",
     newBlock: "return newThing",
-    occurrence: 2  // reemplaza la 2da ocurrencia (default: 1)
+    occurrence: 2
   }]
 })
 ```
 
-**Características:**
-- ✅ Similarity mínima 85% — evita falsos positivos
-- ✅ **Preserva indentación automáticamente** — detecta whitespace del archivo
-- ✅ `occurrence: 1` | `N` | `"last"` — selecciona qué ocurrencia reemplazar
-- ✅ **BOM stripping** — archivos con BOM UTF-8 funcionan
-- ✅ **Trailing whitespace** — diff tolerant a espacios al final
+**Lo que aguanta:** similarity ≥85%, indentación preservada, BOM stripping, trailing whitespace tolerant, `occurrence` selectivo.
 
-### Parámetros globales
+### Comportamiento
 
-| Parámetro | Default | Descripción |
-|-----------|---------|-------------|
-| `operations[]` | — | Operaciones a realizar |
-| `dryRun` | `true` | Preview sin aplicar cambios |
-| `atomic` | `true` | Rollback de TODOS los archivos si alguna operación falla |
-| `verify` | `false` | Ejecuta forja_check (balance llaves/strings) post-parche |
+| Parámetro | Default | Efecto |
+|-----------|---------|--------|
+| `dryRun` | `true` | Preview sin tocar nada |
+| `atomic` | `true` | Si una falla, todas se revierten |
+| `verify` | `false` | forja_check post-parche |
 
-### Validaciones
-
-| Condición | Comportamiento |
-|-----------|---------------|
-| `operations` vacío o faltante | `{ok:false, err: "Missing required parameter"}` |
-| Diff sin hunks válidos | Error: "No valid hunks found" |
-| Diff con 0-1 líneas de contexto | Error: "Incluye al menos 2-3 líneas alrededor del cambio" |
-| Path del diff header ≠ filePath | Error: "no coincide con filePath" |
-| Jaccard < 85% | Error: "similarity: X%, threshold: 85%" |
-| Archivo no existe | Error: "File does not exist" |
-
-### Orden y transaccionalidad
-
-Las operaciones se ejecutan en el orden del array:
-- Si `atomic=true` y la op 2 falla, las ops 0 y 1 se revierten automáticamente
-- Archivos no tocados por ops anteriores no se ven afectados
-- El orden del array importa para el resultado del rollback
+**Validaciones:** operations vacío, diff sin hunks, contexto insuficiente, path mismatch, similarity baja. Todo reportado sin rodeos.
 
 ---
 
-## forja_build — Creación Batch de Archivos
+## 🏗️ forja_build — Batch File Creation
 
 ```
 forja_build({
@@ -146,125 +117,116 @@ forja_build({
     { path: "src/components/Button.tsx", content: "export const Button = ..." },
     { path: "src/components/Input.tsx", content: "export const Input = ..." },
   ],
-  overwrite: false,    // no sobrescribir existentes
-  createDirs: true,    // crear directorios intermedios
-  dryRun: true         // preview antes de crear
+  overwrite: false,
+  createDirs: true,
+  dryRun: true
 })
 ```
 
-| Parámetro | Default | Descripción |
-|-----------|---------|-------------|
-| `files[]` | — | Archivos a crear (path + content) |
-| `overwrite` | `false` | Sobrescribir si ya existe |
-| `createDirs` | `true` | Crear directorios intermedios automáticamente |
-| `dryRun` | `true` | Preview sin crear archivos |
+| Parámetro | Default | Efecto |
+|-----------|---------|--------|
+| `dryRun` | `true` | Preview |
+| `overwrite` | `false` | No pisa archivos existentes |
+| `createDirs` | `true` | Crea directorios intermedios |
 
 ---
 
-## forja_read — Lector Universal
+## 📖 forja_read — Lector Universal
 
-| Acción | Descripción | Cuándo usar |
-|--------|-------------|-------------|
-| `scan` | Estructura: headings (docs), funciones/clases (código), párrafos (texto) | **Siempre primero** — entender qué hay en el archivo |
-| `skeleton` | Solo nombres + números de línea. Ultra-compacto | Cuando quieres ahorrar tokens |
-| `extract` | Extrae por keywords o sección exacta (`## Section Name`) | Cuando sabes lo que buscas |
-| `context` | Símbolo → firma + cuerpo completo + referencias internas | Para entender una función/clase en detalle |
-| `batch` | Múltiples archivos en paralelo con la misma acción | Comparar estructura de varios archivos |
+| Acción | Cuándo |
+|--------|--------|
+| `scan` | **Siempre primero.** Estructura del archivo. |
+| `skeleton` | Solo nombres y línea. Ultra-compacto. |
+| `extract` | Ya sabes lo que buscas. Keywords o sección exacta. |
+| `context` | Símbolo → firma + cuerpo + referencias. |
+| `batch` | Múltiples archivos a la vez. |
 
-**Encoding auto-detection:** UTF-8 → UTF-16LE (BOM) → Latin-1 → si >10% bytes de control → **hex dump**.
+**Encoding:** UTF-8 → UTF-16LE (BOM) → Latin-1 → >10% binario → hex dump.
 
-**Binary fallback:** Muestra magic bytes + MIME detectado (ZIP, PNG, PDF, ELF, PE, MP4...) + dump hex de primeros 256 bytes.
+**Binary fallback:** magic bytes + MIME + primeros 256 bytes en hex.
 
-**80+ extensiones soportadas:** incluyendo Minecraft (.mcfunction, .mcmeta), Godot (.tscn, .tres, .gdshader), L4D2 (.vdf, .qc, .nut, .gnut), LaTeX (.tex, .sty), configs (.ini, .cfg, .properties), data (.csv, .xml, .plist), legacy (.f, .pas, .lisp, .asm).
+**80+ extensiones:** Minecraft, Godot, L4D2, LaTeX, configs, CSV, XML, legacy, etc.
 
 ---
 
-## forja-guard — Seguridad Quirúrgica
+## 🛡️ forja-guard — Seguridad Quirúrgica
 
-Hook `tool.execute.before` para protección mínima:
+Hook `tool.execute.before`. Lo justo y necesario.
 
-| Tool | Protección |
-|------|------------|
+| Tool | Protege |
+|------|---------|
 | `bash` | Escapa comandos con shescape (no regex-block) |
 | `read` | Bloquea `.env`, `credentials.*`, `*secret*`, `*.pem` |
 | `write`/`edit` | Valida filePath dentro de projectRoot |
 
-Sin regex-block de comandos, sin conteo de edits, sin hallucination checks falsos.
+Sin falsos bloqueos, sin conteos, sin hallucination checks pedorros.
 
 ---
 
-## Hooks
+## 🔌 Hooks
 
-| Hook | Propósito |
-|------|-----------|
-| `event` | Detectar session/tool events |
-| `experimental.chat.system.transform` | Inyectar proyector + hints al inicio de cada turno |
-| `experimental.session.compacting` | Preservar proyector + hints en compactación |
-| `tool.execute.before` | Guard + lazy scan en read/edit/write |
-| `tool.execute.after` | Sieve check post-edit automático |
+| Hook | Para qué |
+|------|----------|
+| `event` | Session/tool events |
+| `system.transform` | Proyector + hints al inicio |
+| `compacting` | Preserva estado en compactación |
+| `tool.execute.before` | Guard + lazy scan |
+| `tool.execute.after` | Sieve post-edit |
 
 ---
 
-## Arquitectura
+## 🧱 Arquitectura
 
 ```
-plugins/forja-suite/
+forjasuite/
 ├── src/
-│   ├── index.ts                 ← Orquestador: hooks, eager scan, hints
+│   ├── index.ts              ← Orquestador
 │   ├── core/
-│   │   ├── forja-read.ts        ← Lector universal (encoding fallback, binary dump)
-│   │   ├── forja-skill.ts       ← Gestor de skills OpenCode
-│   │   ├── forja-refactor.ts    ← Batch multi-archivo (diff + Jaccard + rollback)
-│   │   ├── forja-build.ts       ← Batch file creation
-│   │   ├── forja-guard.ts       ← Seguridad quirúrgica
-│   │   └── forja-sieve.ts       ← Verificador sintáctico post-edit
-│   ├── shared/
-│   │   ├── types.ts             ← Interfaces y configuración
-│   │   ├── logger.ts            ← Structured logging via SDK
-│   │   ├── response.ts          ← ok() / fail() helpers
-│   │   ├── proyector.ts         ← Escáner de proyecto con cache
-│   │   └── forja-remind.ts      ← Recordatorios programados
-├── dist/plugin.js               ← Bundle (~100 KB, npm run build)
+│   │   ├── forja-read.ts     ← Lector universal
+│   │   ├── forja-skill.ts    ← Gestor de skills
+│   │   ├── forja-refactor.ts ← Refactor batch
+│   │   ├── forja-build.ts    ← Creación batch
+│   │   ├── forja-guard.ts    ← Seguridad quirúrgica
+│   │   └── forja-sieve.ts    ← Verificador sintáctico
+│   └── shared/
+│       ├── types.ts
+│       ├── logger.ts
+│       ├── response.ts
+│       ├── proyector.ts
+│       └── forja-remind.ts
+├── dist/plugin.js             ← Bundle 100 KB
 ├── package.json
-├── tsconfig.json
 └── README.md
 ```
 
 ---
 
-## Desarrollo
+## 🚫 Anti-patrones
+
+- ❌ `full` si no editas. Jerarquía: `scan` > `skeleton` > `context` > `extract`
+- ❌ `forja_project` en directorio raíz (no hay proyecto)
+- ❌ Loops infinitos en Edit. Máx 2 intentos con re-lectura.
+- ❌ Mezclar `forja_refactor` (editar) con `forja_build` (crear)
+- ❌ Bundlear zod/SDK: `--external:zod --external:@opencode-ai/plugin`
+
+---
+
+## 🛠️ Desarrollo
 
 ```bash
-# Typecheck
-npm run check
-
-# Build bundle
-npm run build          # → dist/plugin.js
-
-# Publicar nueva versión
-npm version patch      # 1.3.0 → 1.3.1
-npm run prepublishOnly # verify + build
+npm run check       # Typecheck
+npm run build       # Bundle → dist/plugin.js
+npm version patch   # 1.3.0 → 1.3.1
 git push --tags
-npm publish
 ```
 
 ---
 
-## Anti-patrones
-
-- NUNCA `full` si no editas — jerarquía token: `scan` > `skeleton` > `context` > `extract`
-- NUNCA `forja_project` sin verificar que `projectRoot` no es raíz
-- NUNCA loops infinitos en Edit — máx 2 intentos con re-lectura
-- NUNCA mezclar `forja_refactor` (editar) con `forja_build` (crear)
-- NUNCA bundlear zod/SDK — `--external:zod --external:@opencode-ai/plugin` siempre
-
----
-
-## ⠀⠀⠀⠀⠀⠀⠀多謝垂注
-⠀⠀⠀⣏⡱ ⣏⡉ ⣏⡱ ⡇ ⣎⣱   ⡷⢾ ⢇⡸
-⠀⠀⠧⠜ ⠧⠤ ⠇⠱ ⠇ ⠇⠸   ⠇⠸ ⠇⠸
-⠀https://ko-fi.com/general_beria
-
----
+```text
+        ⠀⠀⠀⠀⠀⠀⠀多謝垂注
+        ⠀⠀⠀⣏⡱ ⣏⡉ ⣏⡱ ⡇ ⣎⣱   ⡷⢾ ⢇⡸
+        ⠀⠀⠀⠧⠜ ⠧⠤ ⠇⠱ ⠇ ⠇⠸   ⠇⠸ ⠇⠸
+        ⠀https://ko-fi.com/general_beria
+```
 
 **License:** GPL-3.0-only
