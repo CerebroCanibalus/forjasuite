@@ -41,7 +41,7 @@ cd forjasuite && npm install
 
 No recomendada.
 
-> **💀 npm:** pidió 2FA físico. Que se jodan. GitHub Packages.
+> **💀 npm:** que se jodan. GitHub Packages.
 
 ---
 
