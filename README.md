@@ -53,23 +53,37 @@ Vamos a diseccionar ese benchmark:
 - **Verify post-parche** — balance de llaves y paréntesis
 - **Nunca corrompe un archivo.** Prefiere fallar antes que escribir mal
 
-### El autor no sabe TypeScript
+### El autor no sabe programar
 
-No lo digo yo. Lo dice **él mismo** en el Author's Note del README:
+No lo digo yo. Lo dice **él mismo** en el README:
 
-> *"I tested for functionality—I don't really know how to write proper TypeScript. But I personally reviewed and largely rewrote this doc, so read with confidence."*
+> *"I tested for functionality—I don't really know how to write proper TypeScript."*
+> *"99% of this project was built using OpenCode."*
 
-Y más abajo: *"99% of this project was built using OpenCode."* O sea: el 99% del código lo escribió la IA (OpenCode usa LLMs para codegear), y él solo testeó. El resultado: 1.477 commits, 1.335 líneas solo en el manager de background agents, y un plugin monolítico que el autor no entiende del todo. Y encima te pide firmar un CLA para contribuir.
+O sea: el 99% del código lo escribió la IA, él solo testeó. Y se nota. Pero hoy en día el 90% del código lo hace la IA — eso ya no es excusa. El problema real no es el código, es **el diseño.** La IA escribe lo que le pides. Si le pides una mierda arquitectónica, recibes una mierda arquitectónica.
 
-**Forja-suite es la respuesta:**
-- **8 tools reales** con nombres que hacen lo que dicen. Nada de Sísifo ni Prometeo.
-- **Refactor transaccional** con diff unificado + rollback. No un search-and-replace con hash.
-- **100 KB**, cero dependencias externas, cero agentes, cero magia.
-- **Guard quirúrgico** que protege sin joder.
-- **Código escrito por alguien que sí sabe TypeScript.**
-- **Sin skills pedorras. Sin MCPs. Sin orquestación mitológica.**
+Y oh-my-opencode es un desastre arquitectónico:
 
-Oh-my-opencode te vende una película. Forja-suite te da herramientas que funcionan.
+**Monolito con nombre de plugin.** 1.477 commits. Agentes, hooks, tools, MCPs, skills, LSP, CLI, background tasks, instalador, doctor, binarios, CLA, página web, Discord... todo en el mismo repo. No hay separación de concerns. Es un sistema operativo disfrazado de plugin.
+
+**Prompts como arquitectura.** Sísifo es un prompt. El Intent Gate es una instrucción en un prompt. El Plan Agent es otro prompt. La "orquestación" es text templates. Cada nuevo "agente" es otro archivo markdown. En vez de construir infraestructura real (un buen diff engine, un transaction manager, un file system abstraction), lo resuelven todo con más texto. Eso no escala, no es testeable, y se rompe cuando el modelo cambia.
+
+**Sin modelo transaccional.** Editas archivos sin rollback. Hashline no tiene transacciones. Un sistema de edición de archivos SIN transacciones es como una base de datos sin BEGIN/COMMIT. Es un error de diseño fundamental.
+
+**Acoplado a modelos específicos.** Tienen prompts distintos para GPT-5.4, Claude Opus 4.7, Gemini, Kimi K2... cada uno con su "arquitectura" de prompt (GPT usa "8-block", Claude usa otro). Cuando el modelo cambia, los prompts se rompen. Diseñar para el modelo de turno es pan para hoy, hambre para mañana.
+
+**Reemplaza en vez de extender.** Hashline deshabilita `read`, `edit` y `grep` nativos. Un plugin bien diseñado EXTIENDE el sistema, no lo secuestra. Si hashline falla (y falla), te quedas sin herramientas. forja-suite añade tools sin tocar las nativas — siempre tienes plan B.
+
+**Hash de 2 caracteres como core primitive.** Construir un sistema de edición sobre un diccionario de 256 entradas no es un bug, es una decisión arquitectónica mala. Es como construir una casa con cimientos de papel.
+
+**Forja-suite es lo contrario. Diseño real, no prompts:**
+
+- **Arquitectura limpia:** core/ para lógica pura, shared/ para utilidades, index.ts como orquestador. Sin dependencias circulares, sin monolitos.
+- **Herramientas, no agentes.** 8 tools que hacen una cosa y la hacen bien. No necesitas 4 subagentes mitológicos para leer un archivo.
+- **Transaccional por diseño.** forja_refactor tiene BEGIN (diff) → EXECUTE (apply) → ROLLBACK/COMMIT. No es un parche, es la base.
+- **Sin acoplamiento a modelos.** Diff unificado y Jaccard funcionan con cualquier LLM. No importa si usas GPT, Claude o Gemini — el diff es el mismo.
+- **Extiende, no reemplaza.** forja-suite se sienta al lado de las tools nativas. Si algo falla, usas el edit de serie.
+- **100 KB.** Porque no necesitas 1.477 commits para hacer 8 tools.
 
 ---
 
