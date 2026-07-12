@@ -47,25 +47,36 @@ La IA hoy escribe el 90% del código, eso no es novedad. El problema no es que e
 
 ### Pero no todo está perdido
 
-Forja-suite existe para lo contrario: **tools que resuelven problemas reales sin venderte humo.**
+Forja-suite existe para lo contrario: **tools que resuelven problemas reales, diseñadas para lo que OpenCode no te da.**
 
-**Qué hace:**
-Ocho herramientas de línea de comandos para tu agente. Lee archivos en 80+ formatos con auto-detección de encoding. Edita múltiples archivos con diff real y rollback. Crea proyectos enteros en una llamada. Verifica sintaxis sin LLM. Escanea proyectos. Gestiona skills. Programa recordatorios. Y un guard que protege lo justo sin estorbar.
+OpenCode por sí solo tiene un `read` básico, un `edit` que falla si cambia un espacio, un `write` para un archivo a la vez, skills que no se pueden gestionar desde el chat, y cero seguridad. Forja-suite tapa esos agujeros:
+
+| Herramienta | Qué necesitabas | Lo que te damos |
+|-------------|----------------|-----------------|
+| `forja_read` | Leer archivos sin quemar tokens en texto plano | 5 modos (scan/skeleton/extract/context/batch) que ahorran hasta 95% |
+| `forja_project` | Preguntar "qué hay en src/db" sin hacer glob manual | Escaneo estructurado con cache. Consultas por archivos, deps, tipo, árbol |
+| `forja_refactor` | Editar 5 archivos sin 5 tool calls | Diff unificado + Jaccard + rollback. Todo en una llamada |
+| `forja_build` | Crear 10 archivos de una puta vez | Batch creation con dry-run, directorios intermedios, sin pisar existentes |
+| `forja_check` | Verificar que el edit no dejó llaves sueltas | Determinista, 0 tokens, milisegundos |
+| `forja_skill` | Crear/editar skills sin salir del chat | CRUD completo de skills de OpenCode. Creas, editas, listas, borras |
+| `forja_guard` | Que el agente no borre .env ni escape a producción | Shescape + path validation + bloqueo de archivos sensibles |
+| `forja_remind` | Recordar algo en 5 minutos sin poner un timer manual | Recordatorios programados con add/list/remove/recurring |
+| `forja_debug` | Saber qué mierda pasa con el plugin | Estado interno: caché, watchdogs, sessionId, skills cargados |
 
 **Token savings reales:**
-- `forja_read` con acción `scan` o `skeleton` consume un **80% menos de tokens** que leer el archivo entero. Para archivos grandes (1000+ líneas), el ahorro supera el 95%.
-- `forja_refactor` edita N archivos en **una sola tool call**. Cada `edit` nativo cuesta ~500 tokens de overhead entre lectura+escritura+verificación. Para 5 archivos, forja_refactor ahorra ~2000 tokens.
-- `forja_check` es determinista — **0 tokens.** Corre en milisegundos y detecta desbalance de llaves/paréntesis que el LLM pasó por alto.
-- `forja_project` cachea resultados. La primera llamada escanea todo; las siguientes devuelven el cache al instante. Sin repetir.
-- `forja_guard` usa shescape para escapar comandos (no regex blocks falibles). 0 falsos positivos. 0 tokens.
+- `forja_read` en modo `scan` o `skeleton`: **80-95% menos tokens** que leer el archivo entero. Para archivos de 1000+ líneas, el ahorro supera el 95%.
+- `forja_refactor` edita N archivos en **una sola tool call**. Cada `edit` nativo cuesta ~500 tokens de overhead. En 5 archivos ahorras ~2000 tokens.
+- `forja_check`: **0 tokens.** Corre en milisegundos, detecta desbalances que el LLM dejó pasar.
+- `forja_project`: cachea resultados. La primera llamada escanea, las siguientes son instantáneas.
+- `forja_guard`: usa shescape (escapado real), no regex blocks falibles. 0 falsos positivos. 0 tokens.
 
 **Calidad:**
-- 59 tests de integración que cubren diff unificado, Jaccard fuzzy, encoding detection, binary fallback, guard bypass attempts, y edge cases de edición (archivos vacíos, single-line, UTF-16, símbolos)
-- Verify post-parche detecta corrupción antes de que llegue al disco
-- Rollback transaccional: si una operación falla, las anteriores se deshacen
-- Sin dependencias externas. Sin MCPs. Sin agentes. Sin Discord.
+- 59 tests de integración: diff unificado, Jaccard fuzzy, encoding detection, binary fallback, guard bypass, edge cases (vacíos, single-line, UTF-16, símbolos)
+- Verify post-parche: detecta corrupción antes de que llegue al disco
+- Rollback transaccional: si una falla, todas se revierten
+- Sin dependencias externas. Sin MCPs. Sin agentes. Sin Discord. Sin CLA.
 
-**El resultado:** un plugin de 100 KB que tu agente puede usar con cualquier modelo, que no secuestra las tools nativas, que no te pide firmar un CLA, y que nunca te va a corromper un archivo.
+**El resultado:** 100 KB de tools que tu agente puede usar con cualquier modelo, que no secuestran las tools nativas, y que nunca te van a corromper un archivo.
 
 ---
 
@@ -99,18 +110,19 @@ Que se vaya a la mierda NPM.
 
 ---
 
-## 🛠️ Tools
+## 🛠️ Tools al detalle
 
-| Tool | Qué hace |
-|------|----------|
-| `forja_read` | Lector universal. 80+ extensiones, encoding auto-detect, fallback hex dump. Acciones: scan, skeleton, extract, context, batch. |
-| `forja_project` | Escanea estructura y dependencias del proyecto. Lazy cache. Sin args = resumen. |
-| `forja_check` | Balance de llaves, paréntesis, strings. Rápido, sin LLM, determinista. |
-| `forja_skill` | Crea/edita/lista skills de OpenCode. |
-| `forja_refactor` | Edición batch multi-archivo. Transaccional con rollback. Dif unificado o Jaccard fuzzy. |
-| `forja_build` | Creación batch de archivos. Scaffolding, componentes, migraciones. Crea directorios intermedios. |
-| `forja_remind` | Recordatorios programados. add, list, remove. |
-| `forja_debug` | Estado interno del plugin. Diagnóstico rápido. |
+| Tool | Lo que hace | Lo que OpenCode no te da | Tokens |
+|------|------------|--------------------------|--------|
+| `forja_read` | 5 modos de lectura, 80+ formatos, auto-encoding, hex dump | Leer con estructura (scan/skeleton) en vez de texto plano | ~80-95% |
+| `forja_project` | Escanea proyecto, cachea, 5 consultas: files/deps/type/tree/refresh | Preguntar "qué hay en src/db" sin leer el árbol entero | ∞ (cache) |
+| `forja_refactor` | Edición batch multi-archivo, diff unificado + Jaccard, rollback | Editar 10 archivos en 1 call con transacciones | ~2000 en 5 |
+| `forja_build` | Crea N archivos en batch, directorios, dry-run, no pisa | Crear proyectos enteros en 1 tool call | N→1 calls |
+| `forja_check` | Balance llaves/paréntesis/strings, determinista, 0 tokens | Verificar sintaxis post-edit sin LLM | 0 tokens |
+| `forja_skill` | CRUD de skills: create/list/delete desde el chat | Gestionar skills sin salir de la sesión | N/A |
+| `forja_guard` | Escapa bash (shescape), bloquea .env/pem/secret, valida projectRoot | Seguridad quirúrgica sin regex blocks ni falsos bloqueos | 0 tokens |
+| `forja_remind` | Recordatorios programados: add/list/remove/recurring | Sistema de notificaciones temporizadas | N/A |
+| `forja_debug` | Estado interno: caché, watchdogs, sessionId, skills cargados | Diagnóstico rápido sin revisar logs | N/A |
 
 ---
 
@@ -217,18 +229,6 @@ Sin falsos bloqueos, sin conteos, sin hallucination checks pedorros.
 
 ---
 
-## 🔌 Hooks
-
-| Hook | Para qué |
-|------|----------|
-| `event` | Session/tool events |
-| `system.transform` | Proyector + hints al inicio |
-| `compacting` | Preserva estado en compactación |
-| `tool.execute.before` | Guard + lazy scan |
-| `tool.execute.after` | Sieve post-edit |
-
----
-
 ## 🧱 Arquitectura
 
 ```
@@ -252,18 +252,6 @@ forjasuite/
 ├── package.json
 └── README.md
 ```
-
----
-
-## 🚫 Anti-patrones
-
-- ❌ `full` si no editas. Jerarquía: `scan` > `skeleton` > `context` > `extract`
-- ❌ `forja_project` en directorio raíz (no hay proyecto)
-- ❌ Loops infinitos en Edit. Máx 2 intentos con re-lectura.
-- ❌ Mezclar `forja_refactor` (editar) con `forja_build` (crear)
-- ❌ Bundlear zod/SDK: `--external:zod --external:@opencode-ai/plugin`
-
----
 
 ## 🛠️ Desarrollo
 
