@@ -41,7 +41,7 @@ cd forjasuite && npm install
 
 No recomendada.
 
-> **ℹ️ Sobre npm:** Si, este paquete también está en npm. npm nos pidió 2FA con llave física para publicar. Que se jodan. Usamos GitHub Packages. Misma mierda, menos vueltas.
+> **💀 npm:** pidió 2FA físico. Que se jodan. GitHub Packages.
 
 ---
 
