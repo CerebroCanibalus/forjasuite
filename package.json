@@ -1,0 +1,34 @@
+{
+  "name": "forja-suite",
+  "version": "1.3.0",
+  "description": "Forja-Suite — Context engineering SDK para OpenCode: lector universal de archivos, escáner de proyecto, guardia de lectura sensible, validación post-edit (sieve), gestión de skills, recordatorios, refactor batch multi-archivo y scaffolding.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "keywords": [
+    "opencode",
+    "plugin",
+    "development-suite",
+    "languages",
+    "validation",
+    "optimization"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@opencode-ai/plugin": ">=1.4.6"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.28.1",
+    "typescript": "^5.9.3"
+  },
+  "scripts": {
+    "build": "esbuild src/index.ts --bundle --target=es2022 --platform=node --outfile=dist/plugin.js --external:zod --external:@opencode-ai/plugin",
+    "watch": "esbuild src/index.ts --bundle --target=es2022 --platform=node --outfile=dist/plugin.js --external:zod --external:@opencode-ai/plugin --watch",
+    "bundle-size": "esbuild src/index.ts --bundle --target=es2022 --platform=node --outfile=dist/plugin.js --external:zod --external:@opencode-ai/plugin --metafile=dist/meta.json && npx esbuild --analyze=dist/meta.json",
+    "check": "tsc --noEmit"
+  },
+  "opencode": {
+    "title": "Forja-Suite",
+    "icon": "hammer"
+  }
+}

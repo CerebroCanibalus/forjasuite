@@ -1,0 +1,8 @@
+node_modules/
+dist/*.js
+dist/*.map
+dist/meta.json
+dev/
+*.log
+.DS_Store
+Thumbs.db
