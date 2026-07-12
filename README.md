@@ -45,7 +45,8 @@ Vamos a diseccionar ese benchmark:
 
 6. **Reemplaza las tools nativas.** Hashline deshabilita `read`, `edit` y `grep` nativos. No puedes elegir. Si hashline falla, no hay plan B.
 
-**Ahora compáralo con forja_refactor:**
+**Mi solución fue forja_refactor:**
+- **Edita múltiples archivos en UNA sola llamada.** No como hashline que va línea por línea, archivo por archivo. Pasas 10 operaciones en 10 archivos distintos y se ejecutan en orden, con rollback si una falla.
 - **Diff unificado** (determinista, sin hash, sin colisiones)
 - **Jaccard fallback** con 85% de similitud mínima (fuzzy, no hash ciego)
 - **Rollback transaccional** — si algo falla, todo se revierte
