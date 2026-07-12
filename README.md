@@ -2,10 +2,35 @@
 
 > *Toolbox de ingeniería de contexto para OpenCode. Lectura universal de archivos, escaneo de proyecto, edición batch multi-archivo, scaffolding, skills, recordatorios y guardias de seguridad.*
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](#)
+[![npm](https://img.shields.io/npm/v/forjasuite)](https://www.npmjs.com/package/forjasuite)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue)](https://www.typescriptlang.org)
 [![OpenCode Plugin](https://img.shields.io/badge/OpenCode-Plugin-8A2BE2)](https://opencode.ai/docs/plugins)
-[![Bundle](https://img.shields.io/badge/Bundle-100KB-success)](#)
-[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Bundle](https://img.shields.io/badge/Bundle-100KB-success)](https://github.com/CerebroCanibalus/forjasuite)
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+
+---
+
+## Instalación
+
+### 1. Publicar en npm *(una vez, ya hecho)*
+```bash
+npm publish
+```
+
+### 2. Usuario — agregar a `opencode.jsonc`
+
+```jsonc
+{
+  "plugin": ["forjasuite"]
+}
+```
+
+OpenCode resuelve automáticamente el paquete desde npm, lo instala y carga `src/index.ts`.  
+**Sin clonar, sin setup.bat, sin configuración manual.**
+
+### 3. Reiniciar OpenCode
+
+Listo. Las 8 tools están disponibles.
 
 ---
 
@@ -187,45 +212,11 @@ plugins/forja-suite/
 │   │   ├── response.ts          ← ok() / fail() helpers
 │   │   ├── proyector.ts         ← Escáner de proyecto con cache
 │   │   └── forja-remind.ts      ← Recordatorios programados
-│   └── core/forja-sieve.ts      ← Balance checks, calidad
-├── dist/plugin.js               ← Bundle (100 KB)
-├── setup.bat                    ← Instalación + typecheck + verify
+├── dist/plugin.js               ← Bundle (~100 KB, npm run build)
 ├── package.json
-└── tsconfig.json
+├── tsconfig.json
+└── README.md
 ```
-
----
-
-## Instalación
-
-### Requisitos
-
-- [OpenCode](https://opencode.ai) ≥ 1.4.6
-- Node.js ≥ 22
-
-### Setup
-
-```bash
-cd ~/.config/opencode/plugins/forja-suite
-
-# Windows
-setup.bat
-
-# Linux/Mac (si aplica)
-npm install && npx tsc --noEmit
-```
-
-### Activación
-
-Agregar a `opencode.jsonc`:
-
-```json
-{
-  "plugin": ["C:\\Users\\<tu-user>\\.config\\opencode\\plugins\\forja-suite"]
-}
-```
-
-Reiniciar OpenCode.
 
 ---
 
@@ -233,21 +224,17 @@ Reiniciar OpenCode.
 
 ```bash
 # Typecheck
-npx tsc --noEmit
+npm run check
 
 # Build bundle
 npm run build          # → dist/plugin.js
 
-# Setup completo (install + typecheck + verify)
-setup.bat
-setup.bat --clean      # con reinstalación limpia
+# Publicar nueva versión
+npm version patch      # 1.3.0 → 1.3.1
+npm run prepublishOnly # verify + build
+git push --tags
+npm publish
 ```
-
----
-
-## Tests
-
-Los tests están en `TEST_PROMPT.md` (test suite manual) y `TEST_ROUND2.md` (regression tests para fixes). Diseñados para ejecutarse por un agente tester en cualquier repositorio.
 
 ---
 
@@ -268,4 +255,4 @@ Los tests están en `TEST_PROMPT.md` (test suite manual) y `TEST_ROUND2.md` (reg
 
 ---
 
-**License:** MIT
+**License:** GPL-3.0-only

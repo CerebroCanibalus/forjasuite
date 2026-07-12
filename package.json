@@ -1,18 +1,45 @@
 {
-  "name": "forja-suite",
+  "name": "forjasuite",
   "version": "1.3.0",
-  "description": "Forja-Suite — Context engineering SDK para OpenCode: lector universal de archivos, escáner de proyecto, guardia de lectura sensible, validación post-edit (sieve), gestión de skills, recordatorios, refactor batch multi-archivo y scaffolding.",
+  "description": "Forja-Suite — Context Engineering toolkit for OpenCode: universal file reader, project scanner, skill manager, batch refactor/build, reminders, and surgical security guards.",
   "type": "module",
   "main": "./src/index.ts",
+  "files": [
+    "src/",
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
   "keywords": [
     "opencode",
-    "plugin",
-    "development-suite",
-    "languages",
-    "validation",
-    "optimization"
+    "opencode-plugin",
+    "file-reader",
+    "project-scanner",
+    "skill-manager",
+    "batch-refactor",
+    "code-quality",
+    "reminders",
+    "context-engineering"
   ],
-  "license": "MIT",
+  "license": "GPL-3.0-only",
+  "homepage": "https://github.com/CerebroCanibalus/forjasuite",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CerebroCanibalus/forjasuite.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CerebroCanibalus/forjasuite/issues"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "opencode": {
+    "title": "Forja-Suite",
+    "icon": "hammer"
+  },
   "peerDependencies": {
     "@opencode-ai/plugin": ">=1.4.6"
   },
@@ -24,11 +51,8 @@
   "scripts": {
     "build": "esbuild src/index.ts --bundle --target=es2022 --platform=node --outfile=dist/plugin.js --external:zod --external:@opencode-ai/plugin",
     "watch": "esbuild src/index.ts --bundle --target=es2022 --platform=node --outfile=dist/plugin.js --external:zod --external:@opencode-ai/plugin --watch",
-    "bundle-size": "esbuild src/index.ts --bundle --target=es2022 --platform=node --outfile=dist/plugin.js --external:zod --external:@opencode-ai/plugin --metafile=dist/meta.json && npx esbuild --analyze=dist/meta.json",
-    "check": "tsc --noEmit"
-  },
-  "opencode": {
-    "title": "Forja-Suite",
-    "icon": "hammer"
+    "bundle-size": "esbuild src/index.ts --bundle --target=es2022 --platform=node --outfile=dist/plugin.js --external:zod --external:@opencode-ai/plugin --metafile=dist/meta.json && esbuild --analyze=dist/meta.json",
+    "check": "tsc --noEmit",
+    "prepublishOnly": "npm run check && npm run build"
   }
 }
