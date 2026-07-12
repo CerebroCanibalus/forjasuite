@@ -13,14 +13,54 @@
 
 Usé **oh-my-opencode**. Menuda mierda.
 
-Un plugin con 1.477 commits que se vende como "Sísifo, el orquestador principal". Sabes qué es Sísifo en realidad? **Un prompt.** Literalmente le dice al LLM "eres un senior SF Bay Area engineer, delegas y shippeas". Tiene templates separados por modelo, un "Intent Gate" que clasifica tu consulta, y un TODO enforcer para que no se duerma. Y a eso le llaman "el agente que orquesta tu equipo". Es teatro con nombre mitológico.
+### Sísifo: el agente que no es un agente
 
-Su gran innovación? **Hashline Edit.** Un sistema de edición con hashes porque el `edit` nativo de OpenCode acierta el 6.7% de las veces. Lo parchearon al 68.3% y lo venden como revolución. A mí me parece un parche para una carencia que no debería existir.
+Se vende como "Sísifo, el orquestador principal". Sabes qué es? **Un prompt.** 650 líneas de plantilla markdown que le dice al LLM:
 
-Necesitas leer una novela para instalarlo, firmar un CLA, unirte a un Discord, y el autor admite que no sabe TypeScript y lo hizo 99% con IA. El código monolítico de 1.477 commits lo confirma.
+- *"You are a senior SF Bay Area engineer. You delegate, verify, and ship."*
+- Tiene un "Intent Gate" que clasifica tu consulta en research/implementation/evaluation
+- Te obliga a llamar a un "plan agent" para todo
+- Tiene un TODO enforcer para que el agente no se duerma
+- Te exige hacer TDD con RED→GREEN→SURFACE y capturar evidencia
+
+A eso le llaman "orquestación inteligente". Es un prompt con nombre mitológico y un montón de reglas. No hay AGI, no hay orquestación real. Es un system prompt enorme que intenta suplir con ingeniería de texto lo que el plugin no puede hacer con código real.
+
+Y lo peor: su flujo "ultrawork" te obliga a invocar subagentes para todo. Quieres leer un archivo? Primero invoca al Librarian, después al Explore, después al Plan Agent, espera su respuesta, luego tal vez puedas editar. El 80% del tiempo y tokens se pierde en burocracia de agentes.
+
+### Hashline Edit: benchmark amañado y corrupción de archivos
+
+Su gran innovación es **Hashline Edit**. Un sistema que asigna un hash de 2 caracteres a cada línea (`5#NS`) y edita por hash en vez de por contenido. Presumen de un benchmark: *"6.7% → 68.3% de éxito"*.
+
+Vamos a diseccionar ese benchmark:
+
+1. **El 6.7% es una strawman.** Comparan contra el `edit` nativo de OpenCode, que usa búsqueda por string exacto (`oldString`/`newString`). El agente tiene que reproducir el string perfecto incluyendo whitespace. Saben que eso falla a menudo — es la peor línea base posible. Podrían haber comparado contra diff analysis o fuzzy match, pero no les interesa.
+
+2. **El 68.3% sigue siendo una mierda.** 1 de cada 3 ediciones falla. En producción eso es inaceptable.
+
+3. **Los hashes de 2 caracteres = colisión asegurada.** Usan un diccionario de 256 entradas para generar hashes de 2 chars. En un archivo de 50 líneas tienes ~99% de probabilidad de colisión. Cuando dos líneas tienen el mismo hash, el sistema no sabe cuál editar. El resultado: **archivos corruptos.** En mis pruebas pasó exactamente eso.
+
+4. **Autocorrect hacks.** El sistema tiene funciones como `stripInsertAnchorEcho` y `restoreLeadingIndent` — parches para corregir ediciones malformadas después de aplicarlas. En vez de rechazar una edición incorrecta, la aceptan y tratan de arreglarla. Eso no es seguridad, es adivinar.
+
+5. **Sin rollback.** Si el hash falla y escribe donde no debe, no hay transacción, no hay vuelta atrás. El archivo queda corrupto y tienes que rehacerlo con git.
+
+6. **Reemplaza las tools nativas.** Hashline deshabilita `read`, `edit` y `grep` nativos. No puedes elegir. Si hashline falla, no hay plan B.
+
+**Ahora compáralo con forja_refactor:**
+- **Diff unificado** (determinista, sin hash, sin colisiones)
+- **Jaccard fallback** con 85% de similitud mínima (fuzzy, no hash ciego)
+- **Rollback transaccional** — si algo falla, todo se revierte
+- **Verify post-parche** — balance de llaves y paréntesis
+- **Nunca corrompe un archivo.** Prefiere fallar antes que escribir mal
+
+### El autor no sabe TypeScript
+
+No lo digo yo. Lo dice **él mismo** en el Author's Note del README:
+
+> *"I tested for functionality—I don't really know how to write proper TypeScript. But I personally reviewed and largely rewrote this doc, so read with confidence."*
+
+Y más abajo: *"99% of this project was built using OpenCode."* O sea: el 99% del código lo escribió la IA (OpenCode usa LLMs para codegear), y él solo testeó. El resultado: 1.477 commits, 1.335 líneas solo en el manager de background agents, y un plugin monolítico que el autor no entiende del todo. Y encima te pide firmar un CLA para contribuir.
 
 **Forja-suite es la respuesta:**
-
 - **8 tools reales** con nombres que hacen lo que dicen. Nada de Sísifo ni Prometeo.
 - **Refactor transaccional** con diff unificado + rollback. No un search-and-replace con hash.
 - **100 KB**, cero dependencias externas, cero agentes, cero magia.
