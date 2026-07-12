@@ -1,5 +1,5 @@
 {
-  "name": "forjasuite",
+  "name": "@CerebroCanibalus/forjasuite",
   "version": "1.3.0",
   "description": "Forja-Suite — Context Engineering toolkit for OpenCode: universal file reader, project scanner, skill manager, batch refactor/build, reminders, and surgical security guards.",
   "type": "module",
@@ -22,10 +22,11 @@
     "context-engineering"
   ],
   "license": "GPL-3.0-only",
-  "homepage": "https://github.com/CerebroCanibalus/forjasuite",
+  "homepage": "https://github.com/CerebroCanibalus/forjasuite#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/CerebroCanibalus/forjasuite.git"
+    "url": "git+https://github.com/CerebroCanibalus/forjasuite.git",
+    "directory": "/"
   },
   "bugs": {
     "url": "https://github.com/CerebroCanibalus/forjasuite/issues"
@@ -34,6 +35,7 @@
     "node": ">=18"
   },
   "publishConfig": {
+    "registry": "https://npm.pkg.github.com/",
     "access": "public"
   },
   "opencode": {
