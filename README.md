@@ -1,6 +1,6 @@
 # 🔨 Forja-Suite v1.3.0
 
-> *Toolbox de ingeniería de contexto para OpenCode. Ocho herramientas que tu agente debería tener desde el día uno.*
+> Ocho tools reales para un agente que no sea un lastre. Olvídate del hashline pedorro y las skills de manual. Aquí: lector universal, refactor transaccional, builder batch, guard quirúrgico, checker sintáctico, project scanner, skill manager, reminder. 100 KB. OpenCode sin nosotros está cojo.
 
 [![GitHub](https://img.shields.io/badge/GitHub-CerebroCanibalus/forjasuite-8B5CFE?logo=github)](https://github.com/CerebroCanibalus/forjasuite)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)](https://www.typescriptlang.org)
