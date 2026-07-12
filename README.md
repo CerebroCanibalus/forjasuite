@@ -11,10 +11,9 @@
 
 ## 📥 Instalación
 
-### Opción A: GitHub Packages (recomendada)
+### GitHub Packages (recomendada)
 
 ```jsonc
-// opencode.jsonc
 "plugin": ["@CerebroCanibalus/forjasuite"]
 ```
 
@@ -24,10 +23,9 @@ Y en tu `~/.npmrc`:
 @CerebroCanibalus:registry=https://npm.pkg.github.com/
 ```
 
-### Opción B: Local (la que no falla)
+### Local (la que no falla)
 
 ```jsonc
-// opencode.jsonc
 "plugin": ["C:\\Users\\<user>\\.config\\opencode\\plugins\\forja-suite"]
 ```
 
@@ -37,11 +35,7 @@ git clone https://github.com/CerebroCanibalus/forjasuite
 cd forjasuite && npm install
 ```
 
-### Opción C: nada, usa las tools de serie y sufre
-
-No recomendada.
-
-> **💀 npm:** que se jodan. GitHub Packages.
+Que se vaya a la mierda NPM.
 
 ---
 
