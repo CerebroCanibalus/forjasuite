@@ -1,11 +1,34 @@
 # 🔨 Forja-Suite v1.3.0
 
-> Ocho tools reales para un agente que no sea un lastre. Olvídate del hashline pedorro y las skills de manual. Aquí: lector universal, refactor transaccional, builder batch, guard quirúrgico, checker sintáctico, project scanner, skill manager, reminder. 100 KB. OpenCode sin nosotros está cojo.
+> Ocho tools reales para un agente que no sea un lastre. Aquí: lector universal, refactor transaccional, builder batch, guard quirúrgico, checker sintáctico, project scanner, skill manager, reminder. 100 KB. OpenCode sin nosotros está cojo.
 
 [![GitHub](https://img.shields.io/badge/GitHub-CerebroCanibalus/forjasuite-8B5CFE?logo=github)](https://github.com/CerebroCanibalus/forjasuite)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)](https://www.typescriptlang.org)
 [![Bundle](https://img.shields.io/badge/Bundle-100KB-success)](#)
 [![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+
+---
+
+## 🤔 Por qué existe esto
+
+Usé **oh-my-opencode**. Menuda mierda.
+
+Un plugin con 1.477 commits que se vende como "Sísifo, el orquestador principal". Sabes qué es Sísifo en realidad? **Un prompt.** Literalmente le dice al LLM "eres un senior SF Bay Area engineer, delegas y shippeas". Tiene templates separados por modelo, un "Intent Gate" que clasifica tu consulta, y un TODO enforcer para que no se duerma. Y a eso le llaman "el agente que orquesta tu equipo". Es teatro con nombre mitológico.
+
+Su gran innovación? **Hashline Edit.** Un sistema de edición con hashes porque el `edit` nativo de OpenCode acierta el 6.7% de las veces. Lo parchearon al 68.3% y lo venden como revolución. A mí me parece un parche para una carencia que no debería existir.
+
+Necesitas leer una novela para instalarlo, firmar un CLA, unirte a un Discord, y el autor admite que no sabe TypeScript y lo hizo 99% con IA. El código monolítico de 1.477 commits lo confirma.
+
+**Forja-suite es la respuesta:**
+
+- **8 tools reales** con nombres que hacen lo que dicen. Nada de Sísifo ni Prometeo.
+- **Refactor transaccional** con diff unificado + rollback. No un search-and-replace con hash.
+- **100 KB**, cero dependencias externas, cero agentes, cero magia.
+- **Guard quirúrgico** que protege sin joder.
+- **Código escrito por alguien que sí sabe TypeScript.**
+- **Sin skills pedorras. Sin MCPs. Sin orquestación mitológica.**
+
+Oh-my-opencode te vende una película. Forja-suite te da herramientas que funcionan.
 
 ---
 
