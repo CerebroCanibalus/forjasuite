@@ -12,21 +12,33 @@
 
 ## Instalación
 
-### 1. Publicar en npm *(una vez, ya hecho)*
-```bash
-npm publish
-```
-
-### 2. Usuario — agregar a `opencode.jsonc`
+### Opción A: GitHub Packages (recomendada)
 
 ```jsonc
-{
-  "plugin": ["forjasuite"]
-}
+// opencode.jsonc
+"plugin": ["@CerebroCanibalus/forjasuite"]
 ```
 
-OpenCode resuelve automáticamente el paquete desde npm, lo instala y carga `src/index.ts`.  
-**Sin clonar, sin setup.bat, sin configuración manual.**
+OpenCode lo resuelve desde GitHub Packages automáticamente, solo necesitas el registry en tu `~/.npmrc`:
+
+```npmrc
+//npm.pkg.github.com/:_authToken=ghp_<tu-token>
+@CerebroCanibalus:registry=https://npm.pkg.github.com/
+```
+
+### Opción B: Local (ya funcionando)
+
+```jsonc
+// opencode.jsonc
+"plugin": ["C:\\Users\\<user>\\.config\\opencode\\plugins\\forja-suite"]
+```
+
+Requiere clonar el repo:
+```bash
+cd ~/.config/opencode/plugins
+git clone https://github.com/CerebroCanibalus/forjasuite
+cd forjasuite && npm install
+```
 
 ### 3. Reiniciar OpenCode
 
